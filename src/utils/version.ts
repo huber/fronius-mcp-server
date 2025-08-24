@@ -22,7 +22,7 @@ function getPackageJson(): PackageJson {
     const packageJsonContent = readFileSync(packageJsonPath, 'utf-8');
     cachedPackageJson = JSON.parse(packageJsonContent);
     return cachedPackageJson!;
-  } catch (error) {
+  } catch {
     console.warn('Could not read package.json, using fallback version');
     return { name: 'fronius-mcp-server', version: '1.0.0' };
   }
