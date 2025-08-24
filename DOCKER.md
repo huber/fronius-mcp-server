@@ -4,7 +4,7 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://github.com/huber/fronius-mcp-server)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
 
-A Model Context Protocol (MCP) server for the Fronius Solar API. This server enables access to Fronius inverter data through the MCP protocol for direct use in Claude Desktop.
+A Model Context Protocol (MCP) server for the Fronius Solar API. This server enables access to Fronius inverter data through the MCP protocol for direct use in Claude Desktop or any other MCP host application. 
 
 ## Quick Start with Docker
 
@@ -54,7 +54,15 @@ Edit your Claude Desktop configuration file:
 }
 ```
 
-**3. Restart Claude Desktop and Test**
+Replace the `FRONIUS_HOST`value with the DNS name or ip adress of your inverter. 
+
+**3. Enable Fronius Solar API**
+⚠️ **Important**: The Fronius Solar API must be enabled on your inverter:
+- Open your Fronius inverter web interface (usually `http://fronius-inverter.local` or your inverter's IP)
+- Navigate to: **System** → **Hardware** → **Datamanager**
+- Ensure **Solar API** is **enabled**
+
+**4. Restart Claude Desktop and Test**
 - Completely quit and restart Claude Desktop
 - Start a new conversation
 - Test with: *"How much power is my solar system producing?"*
@@ -97,11 +105,20 @@ Edit your Claude Desktop configuration file:
 - **Auto-Cleanup**: `--rm` flag removes container when session ends
 - **Multi-Platform**: Supports AMD64 and ARM64 architectures
 
+## Troubleshooting
+
+**Connection Issues:**
+1. **Check hostname/IP**: `ping fronius-inverter.local` or `ping 192.168.1.100`
+2. **Test API access**: `curl "http://fronius-inverter.local/solar_api/GetAPIVersion.cgi"`
+3. **Fronius Solar API enabled?**: In Fronius web interface → **System** → **Hardware** → **Datamanager** → **Solar API** must be enabled
+4. **Network access**: Ensure no firewall blocks access between Docker and Fronius inverter
+
 ## Links
 
 - **GitHub Repository**: [https://github.com/huber/fronius-mcp-server](https://github.com/huber/fronius-mcp-server)
 - **Full Documentation**: [README.md](https://github.com/huber/fronius-mcp-server#readme)
 - **Issues & Support**: [GitHub Issues](https://github.com/huber/fronius-mcp-server/issues)
+- **Fronius API Documentation**: [Official Fronius Solar API](https://www.fronius.com/~/downloads/Solar%2520Energy/Operating%2520Instructions/42,0410,2012.pdf)
 
 ## License
 
