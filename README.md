@@ -106,16 +106,73 @@ FRONIUS_PORT=443
 
 ## Installation Options
 
-### Option 1: Docker Container (Recommended)
+### Option 1: Pre-built Docker Image (Easiest)
 
-The easiest way to run the Fronius MCP Server is using Docker with Claude Desktop:
+The easiest way to run the Fronius MCP Server is using the pre-built Docker image from Docker Hub:
+
+#### Setup Steps
+
+**1. Pull the Pre-built Image**
+```bash
+# No build required - use the pre-built image
+docker pull huber/fronius-mcp-server:latest
+```
+
+#### Claude Desktop Configuration
+
+**Basic Configuration (Hostname):**
+```json
+{
+  "mcpServers": {
+    "fronius-solar": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "FRONIUS_HOST=fronius-inverter.local",
+        "huber/fronius-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+**Advanced Configuration (IP with HTTPS):**
+```json
+{
+  "mcpServers": {
+    "fronius-solar": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "FRONIUS_HOST=192.168.1.100",
+        "-e", "FRONIUS_PROTOCOL=https",
+        "-e", "FRONIUS_PORT=443",
+        "-e", "FRONIUS_TIMEOUT=15000",
+        "huber/fronius-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+**That's it!** No need to clone the repository or build anything. The pre-built Docker image contains everything needed.
+
+#### Advantages of Pre-built Image
+- ✅ **Zero setup** - No cloning, building, or Node.js required
+- ✅ **Always up-to-date** - Latest stable version
+- ✅ **Multi-platform** - Supports both AMD64 and ARM64 architectures
+- ✅ **Automatic updates** - Pull new versions with `docker pull huber/fronius-mcp-server:latest`
+
+### Option 2: Build Docker Image Yourself
+
+If you prefer to build the image yourself or want to modify the code:
 
 #### Setup Steps
 
 **1. Build the Docker Image**
 ```bash
 # Clone and build the container image
-git clone <repository-url>
+git clone https://github.com/huber/fronius-mcp-server.git
 cd fronius-mcp-server
 npm run docker:build
 ```
@@ -125,6 +182,8 @@ npm run docker:build
 Edit your Claude Desktop configuration file:
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+Use the locally built image name `fronius-mcp-server` instead of the Docker Hub image:
 
 **Basic Configuration (Hostname):**
 ```json
@@ -161,13 +220,7 @@ Edit your Claude Desktop configuration file:
 }
 ```
 
-**3. Restart Claude Desktop**
-- Completely quit Claude Desktop
-- Start Claude Desktop again
-- Begin a new conversation
-- Test with: *"How much power is my solar system producing?"*
-
-#### How It Works
+## How Docker Integration Works
 
 - **Automatic Lifecycle**: Claude Desktop starts a fresh container for each session
 - **Environment Variables**: Environment variables are passed directly as `-e` parameters in the `args` array
@@ -181,7 +234,7 @@ Edit your Claude Desktop configuration file:
 # For the basic configuration, Claude Desktop effectively runs:
 docker run --rm -i \
   -e FRONIUS_HOST=fronius-inverter.local \
-  fronius-mcp-server
+  huber/fronius-mcp-server:latest
 
 # For the advanced configuration, it would run:
 docker run --rm -i \
@@ -189,16 +242,14 @@ docker run --rm -i \
   -e FRONIUS_PROTOCOL=https \
   -e FRONIUS_PORT=443 \
   -e FRONIUS_TIMEOUT=15000 \
-  fronius-mcp-server
+  huber/fronius-mcp-server:latest
 ```
 
-#### Advantages
-
-- ✅ **Zero setup complexity** - Just build image and configure Claude
-- ✅ **Fresh container each session** - Clean state every time
-- ✅ **Direct configuration** - FRONIUS_HOST set in Claude Desktop config
-- ✅ **Automatic cleanup** - No leftover containers
-- ✅ **No scripts required** - Pure Docker integration
+**Final Steps (for both options):**
+1. Edit your Claude Desktop configuration file with one of the configurations above
+2. **Completely quit Claude Desktop** and restart it
+3. **Begin a new conversation**
+4. **Test** with: *"How much power is my solar system producing?"*
 
 #### Alternative: Long-Running Container
 
@@ -231,15 +282,7 @@ docker-compose up -d
 
 **Note**: For long-running containers, the `FRONIUS_HOST` is configured when starting the container (via docker-compose.yml or docker run), not in the Claude Desktop config. The `docker exec` command uses the environment from the running container.
 
-**Advantages of Docker approach:**
-- ✅ **No Node.js installation required** on host machine
-- ✅ **Consistent environment** across different systems  
-- ✅ **Easy updates** via container rebuild
-- ✅ **Isolated from host system** - no dependency conflicts
-- ✅ **Automatic restart** on system reboot
-- ✅ **Resource limits** and monitoring
-
-### Option 2: Local Process
+### Option 3: Local Process (Development)
 
 ## Claude Desktop Setup
 
