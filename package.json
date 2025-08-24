@@ -1,0 +1,45 @@
+{
+  "name": "fronius-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for Fronius Solar API",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "dev": "tsx src/server.ts",
+    "watch": "tsx watch src/server.ts",
+    "clean": "rimraf dist",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit",
+    "test-connection": "npm run build && node dist/test-connection.js",
+    "docker:build": "docker build -t fronius-mcp-server .",
+    "docker:run": "docker run -d --name fronius-mcp-server --restart unless-stopped --env-file .env fronius-mcp-server",
+    "docker:start": "./scripts/run-docker.sh",
+    "docker:test": "./scripts/test-container.sh",
+    "docker:logs": "docker logs -f fronius-mcp-server",
+    "docker:stop": "docker stop fronius-mcp-server && docker rm fronius-mcp-server"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@types/node": "^24.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.40.0",
+    "@typescript-eslint/parser": "^8.40.0",
+    "eslint": "^9.34.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.2"
+  },
+  "keywords": [
+    "mcp",
+    "fronius",
+    "solar",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT"
+}
