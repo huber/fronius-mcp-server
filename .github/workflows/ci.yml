@@ -56,7 +56,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
 
     - name: Build Docker image
-      run: npm run docker:build
+      run: docker build -t fronius-mcp-server .
 
     - name: Test Docker image
       run: |

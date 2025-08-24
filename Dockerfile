@@ -4,14 +4,19 @@ FROM node:24-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files and source code
 COPY package*.json ./
+COPY tsconfig.json ./
+COPY src/ ./src/
 
-# Install dependencies
-RUN npm ci --only=production
+# Install all dependencies (including dev dependencies for building)
+RUN npm ci
 
-# Copy built application
-COPY dist/ ./dist/
+# Build the project
+RUN npm run build
+
+# Remove dev dependencies to reduce image size
+RUN npm ci --only=production && npm cache clean --force
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S mcpuser && \

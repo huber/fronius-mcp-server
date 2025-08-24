@@ -1,15 +1,16 @@
 # Development files
 node_modules/
-src/
-*.ts
-tsconfig.json
+dist/
 eslint.config.js
 
 # Git and documentation
 .git/
 .gitignore
+.github/
 README.md
 CLAUDE.md
+CONTRIBUTING.md
+LICENSE
 
 # Logs and temporary files
 *.log
