@@ -8,11 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build**: `npm run build` (compiles TypeScript to dist/)
 - **Start production**: `npm start` (runs compiled JavaScript)
 - **Install dependencies**: `npm install`
-- **Lint**: `npm run lint` (ESLint with TypeScript rules)
+- **Lint**: `npm run lint` (ESLint 9.x with flat config)
 - **Type check**: `npm run typecheck` (TypeScript compiler check)
-- **Clean build**: `npm run clean` (removes dist/ folder)
-- **Debug Fronius API**: `npm run debug-fronius` (test all API endpoints)
 - **Test connection**: `npm run test-connection` (full API connectivity test)
+- **Docker build**: `npm run docker:build` (build Docker image locally)
+- **Docker compose**: `docker-compose up -d` (run with docker-compose)
 
 ## Architecture Overview
 
@@ -31,6 +31,8 @@ src/
 ├── handlers/        # MCP protocol handlers
 │   ├── resources.ts # Resource-based data access
 │   └── tools.ts     # Tool-based interactive access
+├── utils/           # Utility functions
+│   └── version.ts   # Centralized version management
 └── server.ts        # Main server with error handling and lifecycle
 ```
 
@@ -38,34 +40,45 @@ src/
 
 **FroniusAPIClient** (`src/services/fronius-api.ts`)
 - Complete TypeScript implementation of Fronius Solar API v1
-- Supports all major endpoints with proper error handling and graceful fallbacks
+- Supports all major endpoints including GetStorageRealtimeData and GetOhmPilotRealtimeData
+- **No fallback values** - proper error handling so LLM understands failures
 - Configurable timeouts, retry counts, and connection parameters
 - Built-in connection testing and health checks
-- Special handling for GetAPIVersion.cgi (returns direct JSON, not wrapped)
+- Uses centralized User-Agent from version utility
 
 **Configuration Management** (`src/services/config.ts`)
 - Environment variable-based configuration with validation
+- **Centralized version management** - reads from package.json
 - Support for multiple deployment scenarios (local hostname, IP, HTTPS)
 - Default values and comprehensive error checking
 
+**Version Management** (`src/utils/version.ts`)
+- **Single source of truth** for project version (package.json)
+- Provides getVersion(), getName(), getUserAgent() functions
+- Used by MCP server config and HTTP User-Agent headers
+- Fallback handling if package.json cannot be read
+
 **MCP Handlers** (`src/handlers/`)
-- **ResourceHandler**: Provides 10+ resource URIs for different data types
-- **ToolHandler**: Implements 12 interactive tools with parameter validation
+- **ResourceHandler**: Provides 11+ resource URIs for different data types
+- **ToolHandler**: Implements 13+ interactive tools with parameter validation
+- **MCP SDK 1.17.4** with explicit capabilities configuration
 - Consistent error handling and response formatting
 
 ### Supported Fronius API Endpoints
 
 **Complete API Coverage:**
 - `GetAPIVersion.cgi` - API version information (direct JSON format)
-- `v1/GetLoggerInfo.cgi` - System status and logger info (with fallback)
-- `v1/GetLoggerLEDInfo.cgi` - LED status indicators (with fallback)
+- `v1/GetLoggerInfo.cgi` - System status and logger info
+- `v1/GetLoggerLEDInfo.cgi` - LED status indicators
 - `v1/GetInverterInfo.cgi` - Static inverter information
 - `v1/GetInverterRealtimeData.cgi` - Real-time inverter data (multiple DataCollections)
 - `v1/GetMeterRealtimeData.cgi` - Smart meter measurements
 - `v1/GetPowerFlowRealtimeData.fcgi` - Energy flow visualization data
-- `v1/GetArchiveData.cgi` - Historical data with flexible date ranges (with fallback)
-- `v1/GetSensorRealtimeData.cgi` - Environmental sensor data (with fallback)
-- `v1/GetStringRealtimeData.cgi` - DC string measurements (with fallback)
+- `v1/GetArchiveData.cgi` - Historical data with flexible date ranges
+- `v1/GetSensorRealtimeData.cgi` - Environmental sensor data
+- `v1/GetStringRealtimeData.cgi` - DC string measurements
+- `v1/GetStorageRealtimeData.cgi` - Battery storage system data (NEW)
+- `v1/GetOhmPilotRealtimeData.cgi` - OhmPilot heating element data (NEW)
 - `v1/GetActiveDeviceInfo.cgi` - Active device discovery
 
 ### Configuration
@@ -97,37 +110,99 @@ src/
 - **TypeScript safety** prevents runtime type errors
 - **Input validation** for all tool parameters
 
+## Docker Integration
+
+**Recommended Deployment Method:**
+
+The project now supports comprehensive Docker integration:
+
+**Pre-built Docker Images:**
+- Available on Docker Hub: `dirkhuber/fronius-mcp-server:latest`
+- Multi-platform support (AMD64, ARM64)
+- Automatic builds via GitHub Actions on releases
+
+**Claude Desktop Docker Configuration:**
+```json
+{
+  "mcpServers": {
+    "fronius-solar": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "FRONIUS_HOST=fronius-inverter.local",
+        "dirkhuber/fronius-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+**Docker Features:**
+- **Automatic lifecycle**: Container starts/stops with Claude Desktop sessions
+- **No Node.js required**: Complete isolation from host system
+- **Environment variables**: Passed via `-e` parameters in args
+- **Auto-cleanup**: `--rm` flag removes container after use
+
 ### Claude Desktop Integration
+
+**Three Installation Options:**
+
+1. **Docker (Recommended)**: Use pre-built image from Docker Hub
+2. **Local Build**: Build Docker image locally
+3. **Native Process**: Direct Node.js execution
 
 **Critical Requirements:**
 - **Network Permissions**: Claude Desktop needs explicit network access on macOS
-- **Full path to executables**: Use absolute paths in MCP configuration
-- **Environment variables**: Passed through MCP configuration
+- **Fronius Solar API**: Must be enabled in inverter web interface
+- **Full paths**: Use absolute paths for native process mode
 
 **Network Permissions (macOS):**
-- System Settings → Privacy & Security → Network
+- System Settings → Privacy & Security → Network  
 - Enable network access for Claude Desktop
 - Restart Claude Desktop after permission change
 
+## Release Management
+
+**Centralized Version Control:**
+- Single source of truth: `package.json` version field
+- Automatic propagation to MCP server config and HTTP User-Agent headers
+- `src/utils/version.ts` provides centralized version functions
+
+**Release Process:**
+```bash
+npm version patch    # 1.0.0 → 1.0.1 (automatically creates git tag)
+git push origin main --tags   # Triggers full CI/CD pipeline
+```
+
+**GitHub Actions CI/CD:**
+- **Multi-Node.js testing**: Tests on Node.js 20, 22, 24
+- **Docker build & push**: Automatic multi-platform images to Docker Hub
+- **GitHub Releases**: Auto-created with release notes and assets
+- **Docker Hub sync**: README automatically updated on Docker Hub
+
 ### Development Notes
 
-- Uses ES modules with proper TypeScript configuration
-- ESLint configured for TypeScript with strict rules
+- **TypeScript 5.9.2** with ES modules configuration
+- **ESLint 9.x** with flat configuration (migrated from .eslintrc.json)
+- **MCP SDK 1.17.4** with breaking changes from 0.4.0 (explicit capabilities)
 - Hot reload development mode with tsx
 - All Fronius API responses are fully typed
+- **No fallback values** - proper error propagation for LLM understanding
 - Configuration validation prevents common deployment issues
-- Graceful degradation when API endpoints are not supported by device
 
 ### Testing Strategy
 
-- `npm run debug-fronius` - Tests all API endpoints systematically
 - `npm run test-connection` - Full connection and functionality test
 - Connection test runs automatically on server startup
-- All unsupported endpoints fail gracefully with fallback data
+- **Proper error handling** - no graceful fallbacks, LLM gets real failure info
+- Docker integration testing in CI pipeline
 
 ### Common Issues
 
 1. **Network connectivity**: EHOSTUNREACH errors indicate network/permissions issues
-2. **API endpoint support**: Not all Fronius devices support all endpoints
-3. **JSON parsing**: GetAPIVersion.cgi has different response format than other endpoints
-4. **macOS permissions**: Claude Desktop network access must be explicitly granted
+2. **Fronius Solar API disabled**: Must be enabled in inverter web interface
+3. **API endpoint support**: Not all Fronius devices support all endpoints
+4. **JSON parsing**: GetAPIVersion.cgi has different response format than other endpoints
+5. **macOS permissions**: Claude Desktop network access must be explicitly granted
+6. **MCP SDK updates**: Version 1.17.4 requires explicit capabilities configuration
+7. **Docker Hub permissions**: Requires Access Token (not password) for automated pushes
