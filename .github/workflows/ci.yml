@@ -117,7 +117,7 @@ jobs:
         zip -r fronius-mcp-server-${{ github.event.release.tag_name }}.zip fronius-mcp-server/
 
     - name: Upload release assets
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: |
           release/fronius-mcp-server-${{ github.event.release.tag_name }}.tar.gz
