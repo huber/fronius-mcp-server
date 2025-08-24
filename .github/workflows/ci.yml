@@ -3,6 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main, develop ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
   release:
@@ -64,27 +65,31 @@ jobs:
         docker run --rm fronius-mcp-server node dist/server.js --help
 
     - name: Login to Docker Hub
-      if: github.event_name == 'release'
+      if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+    - name: Extract tag name
+      if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
+      run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
     - name: Build and push Docker image
-      if: github.event_name == 'release'
+      if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/fronius-mcp-server:latest
-          ${{ secrets.DOCKER_USERNAME }}/fronius-mcp-server:${{ github.event.release.tag_name }}
+          ${{ secrets.DOCKER_USERNAME }}/fronius-mcp-server:${{ env.TAG_NAME }}
         platforms: linux/amd64,linux/arm64
 
   release:
     name: Create Release Assets
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
     needs: [test, docker]
 
     steps:
@@ -103,6 +108,9 @@ jobs:
     - name: Build project
       run: npm run build
 
+    - name: Extract tag name
+      run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
     - name: Create release archive
       run: |
         # Create a clean release archive
@@ -110,15 +118,31 @@ jobs:
         cp -r dist/ release/fronius-mcp-server/
         cp package.json package-lock.json release/fronius-mcp-server/
         cp README.md LICENSE release/fronius-mcp-server/
-        cp -r scripts/ release/fronius-mcp-server/
+        cp -r scripts/ release/fronius-mcp-server/ || true
         cp docker-compose.yml Dockerfile .dockerignore release/fronius-mcp-server/
         cd release
-        tar -czf fronius-mcp-server-${{ github.event.release.tag_name }}.tar.gz fronius-mcp-server/
-        zip -r fronius-mcp-server-${{ github.event.release.tag_name }}.zip fronius-mcp-server/
+        tar -czf fronius-mcp-server-${{ env.TAG_NAME }}.tar.gz fronius-mcp-server/
+        zip -r fronius-mcp-server-${{ env.TAG_NAME }}.zip fronius-mcp-server/
 
-    - name: Upload release assets
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ env.TAG_NAME }}
+        name: Release ${{ env.TAG_NAME }}
+        body: |
+          ## Changes
+          
+          Release ${{ env.TAG_NAME }}
+          
+          ### Docker Image
+          ```bash
+          docker pull ${{ secrets.DOCKER_USERNAME }}/fronius-mcp-server:${{ env.TAG_NAME }}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/fronius-mcp-server:latest
+          ```
+          
+          See [README.md](https://github.com/huber/fronius-mcp-server#readme) for setup instructions.
         files: |
-          release/fronius-mcp-server-${{ github.event.release.tag_name }}.tar.gz
-          release/fronius-mcp-server-${{ github.event.release.tag_name }}.zip
+          release/fronius-mcp-server-${{ env.TAG_NAME }}.tar.gz
+          release/fronius-mcp-server-${{ env.TAG_NAME }}.zip
+        draft: false
+        prerelease: false
