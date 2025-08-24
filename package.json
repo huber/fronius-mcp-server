@@ -38,8 +38,27 @@
     "mcp",
     "fronius",
     "solar",
-    "api"
+    "api",
+    "model-context-protocol",
+    "claude-desktop",
+    "inverter",
+    "battery",
+    "ohmpilot",
+    "typescript",
+    "docker"
   ],
-  "author": "",
-  "license": "MIT"
+  "author": "Fronius MCP Server Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huber/fronius-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/huber/fronius-mcp-server/issues"
+  },
+  "homepage": "https://github.com/huber/fronius-mcp-server#readme",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
 }

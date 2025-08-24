@@ -1,5 +1,12 @@
 # Fronius MCP Server
 
+[![CI/CD Pipeline](https://github.com/huber/fronius-mcp-server/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/huber/fronius-mcp-server/actions)
+[![Docker Build](https://img.shields.io/docker/build/huber/fronius-mcp-server)](https://hub.docker.com/r/huber/fronius-mcp-server)
+[![GitHub release](https://img.shields.io/github/v/release/huber/fronius-mcp-server)](https://github.com/huber/fronius-mcp-server/releases)
+[![License](https://img.shields.io/github/license/huber/fronius-mcp-server)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](package.json)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org/)
+
 A Model Context Protocol (MCP) server for the Fronius Solar API. This server enables access to Fronius inverter data through the MCP protocol for direct use in Claude Desktop or any other MCP Host Application. 
 
 ## Features
