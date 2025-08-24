@@ -16,6 +16,7 @@ import type {
   APIVersion,
   LoggerLEDInfo
 } from '../types/fronius.js';
+import { getUserAgent } from '../utils/version.js';
 
 export class FroniusAPIClient {
   private config: FroniusConfig;
@@ -48,7 +49,7 @@ export class FroniusAPIClient {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'fronius-mcp-server/1.0.0'
+          'User-Agent': getUserAgent()
         }
       });
       
@@ -99,7 +100,7 @@ export class FroniusAPIClient {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'fronius-mcp-server/1.0.0'
+          'User-Agent': getUserAgent()
         }
       });
       

@@ -523,6 +523,65 @@ src/
 └── server.ts        # Main server with lifecycle management
 ```
 
+## Release Process
+
+This project uses centralized version management - the version in `package.json` is the single source of truth for all components (MCP server config, User-Agent headers, etc.).
+
+### Creating a Release
+
+**1. Update Version**
+```bash
+# Bump version in package.json (patch/minor/major)
+npm version patch  # 1.0.0 -> 1.0.1
+npm version minor  # 1.0.1 -> 1.1.0  
+npm version major  # 1.1.0 -> 2.0.0
+```
+
+**2. Build and Test**
+```bash
+# Verify everything builds and tests pass
+npm run build
+npm run typecheck
+npm run lint
+npm run test-connection  # If Fronius device available
+```
+
+**3. Create Git Tag and Release**
+```bash
+# The npm version command automatically creates a git tag
+# Push the tag to trigger GitHub Actions release workflow
+git push origin main --tags
+```
+
+**4. GitHub Actions will automatically:**
+- ✅ Run full test suite on multiple Node.js versions
+- ✅ Build and test Docker image
+- ✅ Create GitHub release with changelog
+- ✅ Build and push multi-platform Docker images to Docker Hub
+- ✅ Create release archives (.tar.gz and .zip)
+
+**5. Docker Hub Update**
+Once the GitHub release is published, users can update to the latest version:
+```bash
+docker pull huber/fronius-mcp-server:latest
+# or specific version
+docker pull huber/fronius-mcp-server:v1.0.1
+```
+
+### Version Management
+
+The version is centrally managed in `package.json` and automatically used by:
+- **MCP Server Config** (`src/services/config.ts`) - Server name and version
+- **HTTP User-Agent** (`src/services/fronius-api.ts`) - API client identification
+- **Docker Tags** (`.github/workflows/ci.yml`) - Container versioning
+- **Release Assets** (GitHub Actions) - Archive naming
+
+### Versioning Strategy
+
+- **Patch (1.0.0 → 1.0.1)**: Bug fixes, small improvements
+- **Minor (1.0.0 → 1.1.0)**: New features, API additions, non-breaking changes  
+- **Major (1.0.0 → 2.0.0)**: Breaking changes, API changes, major refactoring
+
 ## Contributing
 
 1. Fork the repository

@@ -1,4 +1,5 @@
 import type { AppConfig } from '../types/config.js';
+import { getName, getVersion } from '../utils/version.js';
 
 export function getDefaultConfig(): AppConfig {
   return {
@@ -12,8 +13,8 @@ export function getDefaultConfig(): AppConfig {
       retryDelay: parseInt(process.env.FRONIUS_RETRY_DELAY || '1000')
     },
     mcp: {
-      name: 'fronius-mcp-server',
-      version: '1.0.0'
+      name: getName(),
+      version: getVersion()
     },
     logLevel: (process.env.LOG_LEVEL as 'error' | 'warn' | 'info' | 'debug') || 'info'
   };
