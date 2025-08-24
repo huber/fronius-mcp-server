@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm start)",
+      "WebSearch",
+      "Bash(npm install)",
+      "Bash(npm run build:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run lint)",
+      "Bash(timeout 10 npm run dev)",
+      "Bash(FRONIUS_HOST=192.168.1.34 npm run test-connection)",
+      "Bash(FRONIUS_HOST=192.168.1.34 node test-endpoints.js)",
+      "Bash(FRONIUS_HOST=192.168.1.34 node dist/server.js --help)",
+      "Bash(chmod:*)",
+      "Bash(FRONIUS_HOST=192.168.1.34 timeout 5 node dist/server.js)",
+      "Read(//Users/dh/Library/Application Support/Claude/**)",
+      "Bash(ping:*)",
+      "Bash(curl:*)",
+      "Bash(node:*)",
+      "Bash(npm outdated)",
+      "Bash(npm view:*)",
+      "Bash(FRONIUS_HOST=fronius-inverter npm run test-connection)",
+      "Bash(timeout:*)",
+      "Bash(npm uninstall:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
