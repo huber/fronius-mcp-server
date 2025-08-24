@@ -1,7 +1,7 @@
 # Fronius MCP Server
 
 [![CI/CD Pipeline](https://github.com/huber/fronius-mcp-server/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/huber/fronius-mcp-server/actions)
-[![Docker Build](https://img.shields.io/docker/build/huber/fronius-mcp-server)](https://hub.docker.com/r/huber/fronius-mcp-server)
+[![Docker Hub](https://img.shields.io/docker/pulls/dirkhuber/fronius-mcp-server)](https://hub.docker.com/r/dirkhuber/fronius-mcp-server)
 [![GitHub release](https://img.shields.io/github/v/release/huber/fronius-mcp-server)](https://github.com/huber/fronius-mcp-server/releases)
 [![License](https://img.shields.io/github/license/huber/fronius-mcp-server)](LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](package.json)
@@ -115,7 +115,7 @@ The easiest way to run the Fronius MCP Server is using the pre-built Docker imag
 **1. Pull the Pre-built Image**
 ```bash
 # No build required - use the pre-built image
-docker pull huber/fronius-mcp-server:latest
+docker pull dirkhuber/fronius-mcp-server:latest
 ```
 
 #### Claude Desktop Configuration
@@ -129,7 +129,7 @@ docker pull huber/fronius-mcp-server:latest
       "args": [
         "run", "--rm", "-i",
         "-e", "FRONIUS_HOST=fronius-inverter.local",
-        "huber/fronius-mcp-server:latest"
+        "dirkhuber/fronius-mcp-server:latest"
       ]
     }
   }
@@ -148,7 +148,7 @@ docker pull huber/fronius-mcp-server:latest
         "-e", "FRONIUS_PROTOCOL=https",
         "-e", "FRONIUS_PORT=443",
         "-e", "FRONIUS_TIMEOUT=15000",
-        "huber/fronius-mcp-server:latest"
+        "dirkhuber/fronius-mcp-server:latest"
       ]
     }
   }
@@ -161,7 +161,7 @@ docker pull huber/fronius-mcp-server:latest
 - ✅ **Zero setup** - No cloning, building, or Node.js required
 - ✅ **Always up-to-date** - Latest stable version
 - ✅ **Multi-platform** - Supports both AMD64 and ARM64 architectures
-- ✅ **Automatic updates** - Pull new versions with `docker pull huber/fronius-mcp-server:latest`
+- ✅ **Automatic updates** - Pull new versions with `docker pull dirkhuber/fronius-mcp-server:latest`
 
 ### Option 2: Build Docker Image Yourself
 
@@ -234,7 +234,7 @@ Use the locally built image name `fronius-mcp-server` instead of the Docker Hub 
 # For the basic configuration, Claude Desktop effectively runs:
 docker run --rm -i \
   -e FRONIUS_HOST=fronius-inverter.local \
-  huber/fronius-mcp-server:latest
+  dirkhuber/fronius-mcp-server:latest
 
 # For the advanced configuration, it would run:
 docker run --rm -i \
@@ -242,7 +242,7 @@ docker run --rm -i \
   -e FRONIUS_PROTOCOL=https \
   -e FRONIUS_PORT=443 \
   -e FRONIUS_TIMEOUT=15000 \
-  huber/fronius-mcp-server:latest
+  dirkhuber/fronius-mcp-server:latest
 ```
 
 **Final Steps (for both options):**
@@ -563,9 +563,9 @@ git push origin main --tags
 **5. Docker Hub Update**
 Once the GitHub release is published, users can update to the latest version:
 ```bash
-docker pull huber/fronius-mcp-server:latest
+docker pull dirkhuber/fronius-mcp-server:latest
 # or specific version
-docker pull huber/fronius-mcp-server:v1.0.1
+docker pull dirkhuber/fronius-mcp-server:v1.0.1
 ```
 
 ### Version Management
