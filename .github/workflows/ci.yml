@@ -9,6 +9,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   test:
     name: Test & Build
@@ -125,7 +129,9 @@ jobs:
         zip -r fronius-mcp-server-${{ env.TAG_NAME }}.zip fronius-mcp-server/
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ env.TAG_NAME }}
         name: Release ${{ env.TAG_NAME }}
