@@ -1,9 +1,24 @@
 {
   "name": "fronius-mcp-server",
   "version": "1.0.4",
-  "description": "MCP Server for Fronius Solar API",
-  "main": "dist/server.js",
+  "description": "MCP Server for Fronius Solar API - enables Claude Desktop access to solar inverter data",
+  "main": "dist/index.js",
   "type": "module",
+  "bin": {
+    "fronius-mcp-server": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "DOCKER.md"
+  ],
   "scripts": {
     "start": "node dist/server.js",
     "build": "tsc",
@@ -22,6 +37,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.4",
+    "commander": "^14.0.0",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
@@ -47,7 +63,7 @@
     "typescript",
     "docker"
   ],
-  "author": "Fronius MCP Server Contributors",
+  "author": "dirkhuber",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -60,5 +76,9 @@
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=9.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

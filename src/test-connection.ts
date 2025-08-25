@@ -1,44 +1,42 @@
 #!/usr/bin/env node
 
-// Standalone test script to verify Fronius connection
+/**
+ * Connection Test Utility
+ * 
+ * Tests the connection to a Fronius inverter and validates the Solar API.
+ * Can be used standalone or imported by other modules.
+ */
+
 import { FroniusAPIClient } from './services/fronius-api.js';
 import { getDefaultConfig } from './services/config.js';
 
-async function testConnection(): Promise<void> {
+export async function testConnection(): Promise<void> {
   const config = getDefaultConfig();
-  console.log(`Testing connection to: ${config.fronius.protocol}://${config.fronius.host}:${config.fronius.port}`);
-  
   const client = new FroniusAPIClient(config.fronius);
-  
+
+  console.log(`🔍 Testing connection to: ${config.fronius.protocol}://${config.fronius.host}:${config.fronius.port}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
   try {
-    console.log('\n1. Testing API Version...');
-    const version = await client.getAPIVersion();
-    console.log('✅ API Version:', version);
-    
-    console.log('\n2. Testing System Status...');
-    const status = await client.getSystemStatus();
-    console.log('✅ System Status:', JSON.stringify(status, null, 2));
-    
-    console.log('\n3. Testing Inverter Info...');
-    const inverterInfo = await client.getInverterInfo();
-    console.log('✅ Inverter Info:', JSON.stringify(inverterInfo, null, 2));
-    
-    console.log('\n4. Testing Power Flow...');
-    const powerFlow = await client.getPowerFlowRealtimeData();
-    console.log('✅ Power Flow:', JSON.stringify(powerFlow, null, 2));
-    
-    console.log('\n🎉 All tests successful! MCP Server should work in Claude Desktop.');
-    
+    // Test API Version
+    console.log('📡 Testing API Version...');
+    const apiVersion = await client.getAPIVersion();
+    console.log(`   ✅ API Version: ${apiVersion.APIVersion}`);
+    console.log(`   ✅ Base URL: ${apiVersion.BaseURL}`);
+
+    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('✅ Connection test completed successfully!');
+
   } catch (error) {
-    console.error('\n❌ Connection test failed:', error instanceof Error ? error.message : error);
-    console.error('\nPlease check:');
-    console.error('- Fronius device IP/hostname is correct');
-    console.error('- Device is on the same network');
-    console.error('- Solar API is enabled on the device');
-    console.error('- No firewall blocking the connection');
-    console.error('\nYou can try:');
-    console.error(`curl "http://${config.fronius.host}/solar_api/GetAPIVersion.cgi"`);
+    console.error('❌ Connection test failed:');
+    console.error(`   Error: ${error instanceof Error ? error.message : String(error)}`);
+    throw error;
   }
 }
 
-testConnection().catch(console.error);
+// Allow running as standalone script
+if (import.meta.url === `file://${process.argv[1]}`) {
+  testConnection().catch(() => {
+    process.exit(1);
+  });
+}

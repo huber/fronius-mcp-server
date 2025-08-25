@@ -106,7 +106,91 @@ FRONIUS_PORT=443
 
 ## Installation Options
 
-### Option 1: Pre-built Docker Image (Easiest)
+### Option 1: NPM Package (Easiest)
+
+The simplest way to install and use the Fronius MCP Server is via npm:
+
+#### Global Installation
+
+**1. Install globally:**
+```bash
+npm install -g fronius-mcp-server
+```
+
+**2. Run directly:**
+```bash
+# Basic usage
+fronius-mcp-server --host fronius-inverter.local
+
+# Advanced usage with HTTPS
+fronius-mcp-server --host 192.168.1.100 --protocol https --port 443
+
+# Test connection
+fronius-mcp-server --test-connection --host fronius-inverter.local
+```
+
+#### Claude Desktop Configuration
+
+Edit your Claude Desktop configuration file:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**Basic Configuration:**
+```json
+{
+  "mcpServers": {
+    "fronius-solar": {
+      "command": "fronius-mcp-server",
+      "args": ["--host", "fronius-inverter.local"]
+    }
+  }
+}
+```
+
+**Advanced Configuration:**
+```json
+{
+  "mcpServers": {
+    "fronius-solar": {
+      "command": "fronius-mcp-server",
+      "args": [
+        "--host", "192.168.1.100",
+        "--protocol", "https",
+        "--port", "443",
+        "--timeout", "15000"
+      ]
+    }
+  }
+}
+```
+
+#### CLI Options
+
+```bash
+fronius-mcp-server --help
+
+Options:
+  -h, --host <host>           Fronius inverter hostname or IP address
+  -p, --port <port>           Fronius inverter port (default: 80)
+  --protocol <protocol>       Protocol http|https (default: http)
+  -t, --timeout <timeout>     Request timeout in ms (default: 10000)
+  -d, --device-id <deviceId>  Default device ID (default: 1)
+  -r, --retries <retries>     Number of retry attempts (default: 3)
+  --retry-delay <delay>       Delay between retries in ms (default: 1000)
+  -l, --log-level <level>     Log level (default: info)
+  --test-connection          Test connection and exit
+  --stdio                    Use stdio transport (default for MCP)
+  --version                  Show version information
+```
+
+#### Advantages of NPM Installation
+- ✅ **Zero setup** - No Docker or Node.js project setup required
+- ✅ **Global availability** - Use `fronius-mcp-server` from anywhere
+- ✅ **Easy updates** - `npm update -g fronius-mcp-server`
+- ✅ **Built-in CLI** - Rich command-line interface with help
+- ✅ **Cross-platform** - Works on Windows, macOS, Linux
+
+### Option 2: Pre-built Docker Image
 
 The easiest way to run the Fronius MCP Server is using the pre-built Docker image from Docker Hub:
 
@@ -163,7 +247,7 @@ docker pull dirkhuber/fronius-mcp-server:latest
 - ✅ **Multi-platform** - Supports both AMD64 and ARM64 architectures
 - ✅ **Automatic updates** - Pull new versions with `docker pull dirkhuber/fronius-mcp-server:latest`
 
-### Option 2: Build Docker Image Yourself
+### Option 3: Build Docker Image Yourself
 
 If you prefer to build the image yourself or want to modify the code:
 
@@ -282,7 +366,9 @@ docker-compose up -d
 
 **Note**: For long-running containers, the `FRONIUS_HOST` is configured when starting the container (via docker-compose.yml or docker run), not in the Claude Desktop config. The `docker exec` command uses the environment from the running container.
 
-### Option 3: Local Process (Development)
+### Option 4: Local Development
+
+For development or if you want to build from source:
 
 ## Claude Desktop Setup
 

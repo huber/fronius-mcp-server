@@ -15,7 +15,7 @@ import { ResourceHandler } from './handlers/resources.js';
 import { ToolHandler } from './handlers/tools.js';
 import type { AppConfig } from './types/config.js';
 
-class FroniusMCPServer {
+export class FroniusMCPServer {
   private server: Server;
   private config: AppConfig;
   private apiClient: FroniusAPIClient;
@@ -140,10 +140,19 @@ class FroniusMCPServer {
       process.exit(1);
     }
   }
+
+  close(): void {
+    // Graceful shutdown - could add cleanup logic here if needed
+    if (this.config.logLevel === 'debug' || this.config.logLevel === 'info') {
+      console.error('[SERVER] Shutting down MCP server...');
+    }
+  }
 }
 
-// Environment variables documentation
-const envHelp = `
+// Only start server if this file is run directly (not imported)
+if (import.meta.url === `file://${process.argv[1]}`) {
+  // Environment variables documentation
+  const envHelp = `
 Environment Variables:
   FRONIUS_HOST          Fronius device hostname or IP (default: fronius-inverter)
   FRONIUS_PORT          Fronius device port (default: 80)
@@ -158,15 +167,16 @@ Example:
   FRONIUS_HOST=fronius-inverter.local FRONIUS_PROTOCOL=https npm start
 `;
 
-// Show help if requested
-if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  console.log(envHelp);
-  process.exit(0);
-}
+  // Show help if requested
+  if (process.argv.includes('--help') || process.argv.includes('-h')) {
+    console.log(envHelp);
+    process.exit(0);
+  }
 
-// Start the server
-const server = new FroniusMCPServer();
-server.run().catch((error) => {
-  console.error('[SERVER] Fatal error:', error);
-  process.exit(1);
-});
+  // Start the server
+  const server = new FroniusMCPServer();
+  server.run().catch((error) => {
+    console.error('[SERVER] Fatal error:', error);
+    process.exit(1);
+  });
+}
